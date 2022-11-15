@@ -79,7 +79,7 @@ const createBlog = async function (req, res) {
       const blogId = req.params.blogId;
     
       if(!blogId){
-          return res.status(400).send({status:false,msg:"BlogId is required"})
+          return res.status(404).send({status:false,msg:"BlogId is not found"})
       }
       const updateData = await blogModel.findOneAndUpdate(
           {_id:blogId,isDeleted:false},
