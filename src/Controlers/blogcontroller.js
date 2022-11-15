@@ -1,6 +1,6 @@
 const blogModel = require("../Models/blogModel")
 const authorModel = require("../Models/authorModel")
-
+const moment=require('moment')
 
 function stringVerify(value) {
   if (typeof value !== "string" || value.length == 0) {
@@ -70,10 +70,59 @@ const createBlog = async function (req, res) {
     } catch (err) {
         console.log("this is the error :",err.message)
         res.status(500).send({msg: "Error", error: err.message})
-      }
-    
-        
+      }   
     }
-  
+    
+const deleteBlog= async function(req,res){
+try{
+let blogId=req.params.blogId
+let blogData= await blogModel.findById({_id:blogId})
+if(!blogData){
+  res.status(404).send({msg:"Does not found any blogg with this id"})
+}
+let deletKey= blogData.isDeleted
+if(deletKey!=true){
+  let byf= await blogModel.findOneAndUpdate({isDeleted: false}, { $set: { isDeleted: true} },{new:true})
+  res.status(200).send({data:byf, msg:"deleted successufully"})
+}else{
+  res.status(200).send({msg:"already deleted"}) 
+}
+} catch (error) {
+  res.status(500).send({status : false , msg : error.message})
+}
+}
+
+
+
+
+const deleteByQuery= async function(req,res){
+
+    try{
+    const {category , subcategory , tag , authorId}  = req.query
+    if(!category && !subcategory && !tag && !authorId ){
+      return  res.status(400).send({status : true , message : 'query does not exist'})
+    }
+    const getAllBlogs = await blogModel.find({$or:[{category : category} , {subcategory : subcategory} ,{tags:tag }, {_id : authorId}] ,isDeleted : true })
+    if ( getAllBlogs.length == 0){
+        return res.status(404).send({status : false , message : 'allready deleted'})
+    }
+    const getBlog = await blogModel.updateMany({$or:[{category : category} , {subcategory : subcategory} ,{tags:tag }, {_id : authorId}] , isDeleted : false} , {$set :{isDeleted : true , deletedAt : moment().format() }} ,{new : true}  )
+   
+    res.status(200).send({status :true , msg : 'Deleted successfully ' }) 
+    
+    
+} catch (error) {
+    res.status(500).send({status : false , msg : error.message})
+}
+}
+
+
+// Delete blog documents by category, authorid, tag name, subcategory name, unpublished
+// If the blog document doesn't exist then return an HTTP status of 404 with a body like this
+
+
   module.exports.createBlog= createBlog;
   module.exports.getBlog= getBlog;
+  module.exports.deleteBlog=deleteBlog;
+  module.exports.deleteByQuery=deleteByQuery;
+  
