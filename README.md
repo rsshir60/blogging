@@ -101,4 +101,4 @@ Successful Login Response structure
   }
 }
 Refer https://jsonplaceholder.typicode.com/guide/ for some fake blogs data.
-Note: Create a group database and use the same database in connection string by re
+Note: Create a group database and use the same database in connection string by replacing `groupXDatabase

@@ -84,8 +84,8 @@ const createBlog = async function (req, res) {
       const updateData = await blogModel.findOneAndUpdate(
           {_id:blogId,isDeleted:false},
           {
-              $set:{title:Data.title, body:Data.body, isPublished:true, publishedAt:new Date()}
-           
+              $set:{title:Data.title, body:Data.body, isPublished:true, publishedAt:new Date()},
+              $push: {  subCategory: req.body.subCategory, tags:req.body.tags  },
           },
           {new:true}
       )
