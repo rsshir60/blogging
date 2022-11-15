@@ -72,6 +72,29 @@ const createBlog = async function (req, res) {
         res.status(500).send({msg: "Error", error: err.message})
       }   
     }
+
+    const updateBlog = async function(req,res){
+      try{
+      const Data = req.body;
+      const blogId = req.params.blogId;
+    
+      if(!blogId){
+          return res.status(400).send({status:false,msg:"BlogId is required"})
+      }
+      const updateData = await blogModel.findOneAndUpdate(
+          {_id:blogId,isDeleted:false},
+          {
+              $set:{title:Data.title, body:Data.body, isPublished:true, publishedAt:new Date()}
+           
+          },
+          {new:true}
+      )
+      return res.status(200).send({status:true,data:updateData})
+      }
+      catch (err) {
+          return  res.status(500).send({ status: false, msg: err.message });
+         }
+    }
     
 const deleteBlog= async function(req,res){
 try{
@@ -122,7 +145,8 @@ const deleteByQuery= async function(req,res){
 
 
   module.exports.createBlog= createBlog;
-  module.exports.getBlog= getBlog;
+  module.exports.getBlog = getBlog;
+  module.exports.updateBlog = updateBlog;
   module.exports.deleteBlog=deleteBlog;
   module.exports.deleteByQuery=deleteByQuery;
   

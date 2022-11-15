@@ -9,6 +9,8 @@ router.post('/createBlog', blogController.createBlog);
 
 router.get('/getBlog', blogController.getBlog)
 
+router.get('/updateBlog/:blogId', blogController.updateBlog)
+
 router.delete('/deleteBlogById/:blogId', blogController.deleteBlog);
 
 router.delete('/deleteByquery', blogController.deleteByQuery);
