@@ -27,15 +27,17 @@ category: {
 subCategory: {
     type: [String],
 },
-isDeleted: {
-    type: Boolean,
-    default: false
-},
 isPublished: {
     type: Boolean,
     default: false
-} 
+} ,
+isDeleted:{
+    type:Boolean,
+    default:false
 },
+deletedAt:String
+},
+
 { timestamps: true });
 
 module.exports = mongoose.model('Blog', blogSchema)

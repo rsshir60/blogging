@@ -6,22 +6,17 @@ const router = express.Router();
 
 router.post('/createAuthor', authorController.createAuthor);
 
-router.post('/createBlog', blogController.createBlog);
+router.post('/createBlog',middController.middauth, blogController.createBlog);
 
-router.get('/getBlog', blogController.getBlog)
+router.get('/getBlog',middController.middauth, blogController.getBlog)
 
-router.put('/updateBlog/:blogId', blogController.updateBlog)
+router.put('/updateBlog/:blogId',middController.middauth,middController.authForpath, blogController.updateBlog)
 
-router.delete('/deleteBlogById/:blogId',middController.authorisation, blogController.deleteBlog);
+router.delete('/deleteBlogById/:blogId',middController.middauth,middController.authForpath, blogController.deleteBlog);
 
-router.delete('/deleteByquery', blogController.deleteByQuery);
+router.delete('/deleteByquery',middController.middauth, blogController.deleteByQuery);
 
-router.post('/login', blogController.login)
-
-router.post('/midd', blogController.middauth)
-
-
-
+router.post('/login',authorController.login)
 
 
 module.exports = router;
