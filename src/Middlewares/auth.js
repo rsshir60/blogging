@@ -1,71 +1,66 @@
-const blogModel = require("../Models/blogModel")
 const jwt = require("jsonwebtoken");
-const { isValidObjectId } = require("mongoose")
+const blogModel = require("../Models/blogModel");
+const mongoose = require("mongoose");
 
 
+// //---------------------authentication--------------------//
 
-const authForpath = async function (req, res, next) {
-try {
-  let token = req.headers["x-api-key"]
-  if (!token) {
-    res.status(400).send({ status:false,msg: "token not present" })
-  }
-  let decodedToken = jwt.verify(token, "#group20");
-  blogId = req.params.blogId
-  const ValidID = isValidObjectId(blogId)
-  
-  if (!ValidID || !blogId) {
-      return res.status(400).send({ status: false, msg: 'authorid is invalid or not send by user' })}
+const authenticate = function (req, res, next) {
 
-    let blogdata = await blogModel.findOne({ _id: blogId })
-  
-  if (blogdata.authorId == decodedToken.ID) {
-    next()
-  }
-  else {
-    return res.status(403).send({ status: false, msg: "not authorised" })
-  }
-} catch (error) {
-  res.status(500).send({ msg: "Error", error: error.message })
-}
-}
-  
-const authForquery = async function (req, res, next) {
+    try {
+        const token = req.headers["x-api-key"]
 
-  let queryId = req.query.authorId
-  let token = req.headers["x-api-key"]
-  if (!token) {
-    res.status(400).send({ msg: "token not present" })
-  }
-  let decodedToken = jwt.verify(token, "#group20");
-  let blogdata = await blogModel.findOne({ _id: queryId })
-  if (blogdata.authorId == decodedToken.ID) {
-    next()
-  }
-  else {
-    return res.status(403).send({ status: false, msg: "not authorised" })
-  }
+        if (!token) {
+            return res.status(401).send({ status: false, msg: "Token must be present" });
+        }
 
+        const decodedToken = jwt.verify(token, "project1-room14-key");
+        req.decodedToken = decodedToken
+
+        if (decodedToken) {
+            next()
+        }
+        else {
+            return res.status(401).send({ status: false, msg: "Token is invalid" });
+        }
+    } catch (err) {
+        console.log("this is the error :", err.message)
+        res.status(500).send({ msg: "Error", error: err.message })
+    }
 }
 
-const middauth=async function(req,res,next){
 
-  let token= req.headers["x-api-key"]
-  if(!token){
-    res.status(400).send({ status:false,msg:"token not present"})
-  }
-  let decodedToken = jwt.verify(token, "#group20");
-  
-  if(!decodedToken){
-    res.status(401).send({ status:false,msg:"token is not valid"})
-  }
-  next()
-  }
+//-----------------------authorisation------------------------//
 
-module.exports.authForpath=authForpath;
-module.exports.authForquery=authForquery;
-module.exports.middauth=middauth;
+const authorise = async function (req, res, next) {
 
+    try {
+        const decodedToken = req.decodedToken
+        
+        let blogId = req.params.blogId;
+    
+        const blog = await blogModel.findById(blogId);
+
+        if (!blog) {
+            return res.status(404).send({ status: false, msg: "Blog is not found" });
+        }
+
+        let tokenUser = decodedToken.authorId;
+        let loginUser = blog.authorId
+
+        if (tokenUser == loginUser) {
+            next()
+        } else {
+            return res.status(403).send({ status: false, msg: "unauthorized  user info doesn't match" });
+        }
+    } catch (err) {
+        return res.status(500).send({ status: false, error: err.message });
+    }
+};
+
+
+
+module.exports = { authenticate, authorise }
 
 
 
@@ -86,7 +81,7 @@ module.exports.middauth=middauth;
 //         let token = req.headers["x-api-key"];
 //         if (!token)
 //             return res.status(401).send({ status: false, msg: "token is required" });
-//         jwt.verify(token, "group-14-secretkey", function (error, decoded) {
+//         jwt.verify(token, "group-09-secretkey", function (error, decoded) {
 //             if (error) {
 //                 return res.status(401).send({ status: false, msg: "Authentication failed" });
 //             } else {
@@ -144,11 +139,4 @@ module.exports.middauth=middauth;
 //     }
 // }
 // module.exports = { authenticate, authorize, authIdValid, blogIdValid }
-
-
-
-        
-    
-
-
 
