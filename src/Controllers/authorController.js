@@ -1,14 +1,7 @@
 const authorModel = require("../Models/authorModel")
 const jwt = require("jsonwebtoken");
-const stringvalid =/[^(A-Z)]+[a-z]+(?:(?:|['_\. ])([a-z]*(\.\D)?[a-z])+)*$/
+// const stringvalid =/[^(A-Z)]+[a-z]+(?:(?:|['_\. ])([a-z]*(\.\D)?[a-z])+)*$/
 
-// function isEmail(email) {
-
-//     var emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
-
-//     if (email !== '' && email.match(emailFormat)) { return true; }
-//     return false;
-// }
 
 function stringVerify(value) {
     if (typeof value !== "string" || value.length == 0) {
@@ -23,12 +16,10 @@ const createAuthor = async function (req, res) {
 
     try {
         let data = req.body;
-
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ msg: "Please Enter details" });
         }
-
-        let { fname, lname, title, email, password } = data;
+        let { fname, lname, title, Email, password } = data;
 
         if (!fname) {
             return res.status(400).send({ msg: "fname is required" });
@@ -46,7 +37,6 @@ const createAuthor = async function (req, res) {
                 return res.status(400).send({ msg: "lname should be type string" });
             }
         }
-
         if (!title) {
             return res.status(400).send({ msg: "Title is required" });
         }
@@ -57,7 +47,6 @@ const createAuthor = async function (req, res) {
                 return res.status(400).send({ msg: "Please write title like Mr, Mrs, Miss" });
             }
         }
-
         if (!password) {
             return res.status(400).send({ msg: "Password is required" });
         }
@@ -66,17 +55,15 @@ const createAuthor = async function (req, res) {
         if (!validPassword) {
             return res.status(400).send({ status: false, msg: " Incorrect Password, It should be of 6-10 digits with atlest one special character, alphabet and number" });
         }
-
-        if (!email) {
+        if (!Email) {
             return res.status(400).send({ msg: "Email is required" })
         }
         const emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
-        const validEmail = emailFormat.test(email)
+        const validEmail = emailFormat.test(Email)
         if (!validEmail) {
             return res.status(400).send({ msg: "Please enter valid Email" });
         }
-
-        let emailinUse= await authorModel.findOne({email:email})
+        let emailinUse= await authorModel.findOne({Email:Email})
         if(emailinUse)return res.status(400).send({status:false,msg:"email already in use"})
 
         let authordata = await authorModel.create(data)
@@ -85,7 +72,6 @@ const createAuthor = async function (req, res) {
     catch (err) {
         res.status(500).send({ error: err.message, status: false });
     }
-
 }
 
 

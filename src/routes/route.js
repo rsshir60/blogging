@@ -1,27 +1,26 @@
 
-const authorController = require("../Controlers/authorController");
-const blogController = require("../Controlers/blogController");
+const authorController = require("../Controllers/authorController");
+const blogController = require("../Controllers/blogController");
 const MW = require("../Middlewares/auth");
 const express = require("express")
 const router = express.Router();
 
 
-
-
-
 router.post('/authors', authorController.createAuthor);
+
+router.post("/login", authorController.loginAuthor);
 
 router.post('/blogs', MW.authenticate, blogController.createBlog);
 
-router.get('/blogs', MW.authenticate, blogController.getBlog);
-
 router.put("/blogs/:blogId", MW.authenticate, MW.authorise, blogController.updateBlog);
+
+router.get('/blogs', MW.authenticate, blogController.getBlog);
 
 router.delete("/blogs/:blogId", MW.authenticate, MW.authorise, blogController.deleteBlogByPathParam);
 
 router.delete("/blogs",MW.authenticate, blogController.deleteByQuery);
 
-router.post("/login", authorController.loginAuthor);
+
 
 
 
@@ -33,9 +32,6 @@ router.all("/*", function (req, res) {
     })
 }catch(err){res.send(err.message)}
 })
-
-
-module.exports = router;
 
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const blogModel = require("../Models/blogModel");
 const authorModel = require("../Models/authorModel");
 const mongoose = require("mongoose")
-// const objectId = mongoose.Types.ObjectId
+
 
 
 function stringVerify(value) {
@@ -54,9 +54,9 @@ const createBlog = async function (req, res) {
       return res.status(400).send({ status: false, msg: "Category should be type String" });
     }
 
-    if (typeof (tags && subcategory) !== "object") {
-      return res.status(400).send({ status: false, msg: "tags/subCategory should be in Array of String only" });
-    }
+    // if (typeof (tags && subcategory) !== "object") {
+    //   return res.status(400).send({ status: false, msg: "tags/subCategory should be in Array of String only" });
+    // }
 
     let authId = await authorModel.findById(data.authorId)
 
@@ -86,22 +86,20 @@ const getBlog = async function (req, res) {
         return res.status(400).send({ msg: "Category should be type String" });
       }
     }
-    if (tags || subcategory) {
-      if (typeof (tags || subcategory) !== "object") {
-        return res.status(400).send({ status: false, msg: "tags/subCategory should be in Array of String only" });
-      }
-    }
+    // if (tags || subcategory) {
+    //   if (typeof (tags || subcategory) !== "object") {
+    //     return res.status(400).send({ status: false, msg: "tags/subCategory should be in Array of String only" });
+    //   }
+    // }
     if (authorId) {
       if (!mongoose.Types.ObjectId.isValid(authorId)) { return res.status(400).send({ status: false, msg: "! Oops authorId is not valid" }) }
     }
 
-
-
-    // console.log(allblog)
     let blogDetails = await blogModel.find({ $and: [{ isDeleted: false, isPublished: true }, allblog] })
     if (blogDetails == 0) {
       return res.status(404).send({ status: false, msg: "blog not found" })
     }
+    
     else {
       res.status(200).send({ status: true, data: blogDetails })
     }
@@ -109,7 +107,6 @@ const getBlog = async function (req, res) {
     res.status(500).send({ msg: "Error", error: err.message })
   }
 }
-
 
 
 //------------------------------updateBlog api----------------------//
@@ -133,9 +130,6 @@ const updateBlog = async function (req, res) {
         return res.status(400).send({ status: false, msg: "tags/subcategory should be in array of string only" })
       }
     }
-
-    console.log(data)
-
     let checkisDleted = await blogModel.findOne({ _id: data, isDeleted: true })
     
     if (checkisDleted) return res.status(404).send({ status: false, msg: "no blog found" })
