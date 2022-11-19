@@ -19,7 +19,7 @@ const createAuthor = async function (req, res) {
         if (Object.keys(data).length == 0) {
             return res.status(400).send({ msg: "Please Enter details" });
         }
-        let { fname, lname, title, Email, password } = data;
+        let { fname, lname, title, email, password } = data;
 
         if (!fname) {
             return res.status(400).send({ msg: "fname is required" });
@@ -55,16 +55,25 @@ const createAuthor = async function (req, res) {
         if (!validPassword) {
             return res.status(400).send({ status: false, msg: " Incorrect Password, It should be of 6-10 digits with atlest one special character, alphabet and number" });
         }
-        if (!Email) {
+        if (!email) {
             return res.status(400).send({ msg: "Email is required" })
         }
+        // const isValidEmail = function (value) {
+        //     let emailRegex =/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-z\-0-9]+\.)+[a-z]{2,3}))$/
+             
+        //     if (emailRegex.test(value)) return true;
+        //   }
+
         const emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
-        const validEmail = emailFormat.test(Email)
+        const validEmail = emailFormat.test(email)
         if (!validEmail) {
             return res.status(400).send({ msg: "Please enter valid Email" });
         }
-        let emailinUse= await authorModel.findOne({Email:Email})
-        if(emailinUse)return res.status(400).send({status:false,msg:"email already in use"})
+        let emailinUse= await authorModel.findOne({email:email})
+        if(emailinUse)   return res.status(400).send({status:false,msg:"email already in use"})
+
+        // let uniqueEmail= await authorModel.findOne({email:email})
+        // if(uniqueEmail)  return res.status(400).send({status:false,message:"email is already exist"})
 
         let authordata = await authorModel.create(data)
          return  res.status(201).send({ status:true , data: authordata });
@@ -80,18 +89,18 @@ const createAuthor = async function (req, res) {
 const loginAuthor = async function (req, res) {
 
     try {
-        const Email = req.body.email;
-        const Password = req.body.password;
+        const email = req.body.email;
+        const password = req.body.password;
 
-        if (!Email) {
+        if (!email) {
             return res.status(400).send({ msg: "Email is not present" });
         }
 
-        if (!Password) {
+        if (!password) {
             return res.status(400).send({ msg: "Password is not present" });
         }
 
-        let author = await authorModel.findOne({ email: Email, password: Password });
+        let author = await authorModel.findOne({ email: email, password: password });
 
         if (!author) {
             return res.status(404).send({ status: false, msg: "Email or Password is not corerct" });
