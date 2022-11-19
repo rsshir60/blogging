@@ -1,14 +1,15 @@
 const authorModel = require("../Models/authorModel")
 const jwt = require("jsonwebtoken");
+const {isValidEmail,isValidString,isValidPassword} = require("../validator/validator");
 // const stringvalid =/[^(A-Z)]+[a-z]+(?:(?:|['_\. ])([a-z]*(\.\D)?[a-z])+)*$/
 
 
-function stringVerify(value) {
-    if (typeof value !== "string" || value.length == 0) {
-        return false
-    }
-    return true
-}
+// function stringVerify(value) {
+//     if (typeof value !== "string" || value.length == 0) {
+//         return false
+//     }
+//     return true
+// }
 
 //--------------------------createAuthor api---------------------//
 
@@ -24,51 +25,63 @@ const createAuthor = async function (req, res) {
         if (!fname) {
             return res.status(400).send({ msg: "fname is required" });
         }
-        if (fname) {
-            if (!stringVerify(fname)) {
-                return res.status(400).send({ msg: "fname should be type string" });
-            }
-        }
+        // if (fname) {
+        //     if (!stringVerify(fname)) {
+        //         return res.status(400).send({ msg: "fname should be type string" });
+        //     }
+        // }
         if (!lname) {
             return res.status(400).send({ msg: "lname is required" });
         }
-        if (lname) {
-            if (!stringVerify(lname)) {
-                return res.status(400).send({ msg: "lname should be type string" });
-            }
-        }
+        // if (lname) {
+        //     if (!stringVerify(lname)) {
+        //         return res.status(400).send({ msg: "lname should be type string" });
+        //     }
+        // }
+
+        if(!isValidString(fname))   return res.status(400).send({ status: false, msg: "Please provide valid fname" })
+        if(!isValidString(lname))   return res.status(400).send({ status: false, msg: "Please provide valid lname" })
+    
         if (!title) {
             return res.status(400).send({ msg: "Title is required" });
         }
-        if (title) {
-            if (!stringVerify(title)) {
-                return res.status(400).send({ msg: "Title should be string" });
-            } if (title != "Mr" && title != "Miss" && title != "Mrs") {
-                return res.status(400).send({ msg: "Please write title like Mr, Mrs, Miss" });
-            }
-        }
+
+        let titles=["Mr","Mrs","Miss"]
+        if(!titles.includes(title))  return res.status(400).send({status:false,msg:"Please provide the title in these options - Mr || Mrs || Miss"})
+        
+        // if (title) {
+        //     if (!stringVerify(title)) {
+        //         return res.status(400).send({ msg: "Title should be string" });
+        //     } if (title != "Mr" && title != "Miss" && title != "Mrs") {
+        //         return res.status(400).send({ msg: "Please write title like Mr, Mrs, Miss" });
+        //     }
+        // }
         if (!password) {
             return res.status(400).send({ msg: "Password is required" });
         }
-        const passwordFormat = /^[a-zA-Z0-9@]{6,10}$/
-        const validPassword = passwordFormat.test(password)
-        if (!validPassword) {
-            return res.status(400).send({ status: false, msg: " Incorrect Password, It should be of 6-10 digits with atlest one special character, alphabet and number" });
-        }
+
+        if(!isValidPassword(password))  return res.status(400).send({ status: false, msg: "Please provide valid password" })
+        // const passwordFormat = /^[a-zA-Z0-9@]{6,10}$/
+        // const validPassword = passwordFormat.test(password)
+        // if (!validPassword) {
+        //     return res.status(400).send({ status: false, msg: " Incorrect Password, It should be of 6-10 digits with atlest one special character, alphabet and number" });
+        // }
         if (!email) {
             return res.status(400).send({ msg: "Email is required" })
         }
+        if(!isValidEmail(email))  return res.status(400).send({status:false,msg:"invalid emailid"})
         // const isValidEmail = function (value) {
         //     let emailRegex =/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-z\-0-9]+\.)+[a-z]{2,3}))$/
              
         //     if (emailRegex.test(value)) return true;
         //   }
 
-        const emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
-        const validEmail = emailFormat.test(email)
-        if (!validEmail) {
-            return res.status(400).send({ msg: "Please enter valid Email" });
-        }
+        // const emailFormat = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/
+        // const validEmail = emailFormat.test(email)
+        // if (!validEmail) {
+        //     return res.status(400).send({ msg: "Please enter valid Email" });
+        // }
+
         let emailinUse= await authorModel.findOne({email:email})
         if(emailinUse)   return res.status(400).send({status:false,msg:"email already in use"})
 

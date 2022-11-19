@@ -1,15 +1,15 @@
 const blogModel = require("../Models/blogModel");
 const authorModel = require("../Models/authorModel");
+const {idCharacterValid,isValidString} = require("../validator/validator");
 const mongoose = require("mongoose")
 
 
-
-function stringVerify(value) {
-  if (typeof value !== "string" || value.length == 0) {
-    return false
-  }
-  return true;
-}
+// function stringVerify(value) {
+//   if (typeof value !== "string" || value.length == 0) {
+//     return false
+//   }
+//   return true;
+// }
 
 //--------------------------createBlog api--------------------------//
 
@@ -38,21 +38,38 @@ const createBlog = async function (req, res) {
       return res.status(400).send({ status: false, msg: "Category is required" });
     }
 
-    if (!stringVerify(title)) {
-      return res.status(400).send({ status: false, msg: "Title should be type String" });
-    }
+    // if (!stringVerify(title)) {
+    //   return res.status(400).send({ status: false, msg: "Title should be type String" });
+    // }
 
-    if (!stringVerify(body)) {
-      return res.status(400).send({ status: false, msg: "Body should be type String" });
-    }
+    // if (!stringVerify(body)) {
+    //   return res.status(400).send({ status: false, msg: "Body should be type String" });
+    // }
 
-    if (!stringVerify(authorId)) {
-      return res.status(400).send({ status: false, msg: "AuthorId should be type String" });
-    }
+    // if (!stringVerify(authorId)) {
+    //   return res.status(400).send({ status: false, msg: "AuthorId should be type String" });
+    // }
 
-    if (!stringVerify(category)) {
-      return res.status(400).send({ status: false, msg: "Category should be type String" });
-    }
+    // if (!stringVerify(category)) {
+    //   return res.status(400).send({ status: false, msg: "Category should be type String" });
+    // }
+    if (!isValidString(title)) return res.status(400).send({
+      status: false,
+      msg: "Please provide valid title"
+    })
+    if (!isValidString(body)) return res.status(400).send({
+      status: false,
+      msg: "Please provide valid body"
+    })
+    if (!isValidString(category)) return res.status(400).send({
+      status: false,
+      msg: "Please provide valid category"
+    });
+
+    if (!idCharacterValid(authorId)) return res.status(400).send({
+      status: false,
+      msg: "Please provide the valid authorid"
+    })
 
     // if (typeof (tags && subcategory) !== "object") {
     //   return res.status(400).send({ status: false, msg: "tags/subCategory should be in Array of String only" });
@@ -81,10 +98,17 @@ const getBlog = async function (req, res) {
     let allblog = req.query;
     let { authorId, category, tags, subcategory } = allblog;
 
+  
     if (category) {
-      if (!stringVerify(category)) {
-        return res.status(400).send({ msg: "Category should be type String" });
-      }
+
+      if (!isValidString(category)) return res.status(400).send({
+        status: false,
+        msg: "Please provide valid category"
+      });
+  
+      // if (!stringVerify(category)) {
+      //   return res.status(400).send({ msg: "Category should be type String" });
+      // }
     }
     // if (tags || subcategory) {
     //   if (typeof (tags || subcategory) !== "object") {
